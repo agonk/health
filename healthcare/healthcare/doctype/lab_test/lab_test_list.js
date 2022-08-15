@@ -29,8 +29,8 @@ var create_multiple_dialog = function (listview) {
 		fields: [
 			{ fieldtype: 'Link', label: 'Patient', fieldname: 'patient', options: 'Patient', reqd: 1 },
 			{
-				fieldtype: 'Select', label: 'Invoice / Patient Encounter', fieldname: 'doctype',
-				options: '\nSales Invoice\nPatient Encounter', reqd: 1
+				fieldtype: 'Select', label: 'Invoice / Patient Encounter / Sales Order', fieldname: 'doctype',
+				options: '\nSales Invoice\nPatient Encounter\nSales Order', reqd: 1
 			},
 			{
 				fieldtype: 'Dynamic Link', fieldname: 'docname', options: 'doctype', reqd: 1,

@@ -111,6 +111,8 @@ def create_multiple(doctype, docname):
 		lab_test_created = create_lab_test_from_invoice(docname)
 	elif doctype == 'Patient Encounter':
 		lab_test_created = create_lab_test_from_encounter(docname)
+    elif doctype == 'Sales Order':
+		lab_test_created = create_lab_test_from_order(docname)
 
 	if lab_test_created:
 		frappe.msgprint(_('Lab Test(s) {0} created successfully').format(lab_test_created), indicator='green')
@@ -163,6 +165,27 @@ def create_lab_test_from_invoice(sales_invoice):
 					else:
 						lab_tests_created += ', ' + lab_test.name
 	return lab_tests_created
+    
+def create_lab_test_from_order(sales_order):
+	lab_testss_created = False
+	order = frappe.get_doc('Sales Order', sales_order)
+	if order and order.patient:
+		patient = frappe.get_doc('Patient', order.patient)
+		for item in order.items:
+			lab_test_created = frappe.db.get_value('Sales Order Item', item.name, 'lab_test_created')
+			if lab_test_created == 0:
+				template = get_lab_test_template(item.item_code)
+				if template:
+					lab_test = create_lab_test_doc(False, order._referring_practitioner, patient, template, order.company)
+					lab_test.save(ignore_permissions = True)
+					frappe.db.set_value('Sales Order Item', item.name, 'lab_test_created', 1)
+					if not lab_testss_created:
+						lab_testss_created = lab_test.name
+					else:
+						lab_testss_created += ', ' + lab_test.name
+	return lab_testss_created
+    
+    #You have to add "Lab Test Created" (lab_test_created) field in Sales Order Item doctype
 
 def get_lab_test_template(item):
 	template_id = frappe.db.exists('Lab Test Template', {'item': item})
